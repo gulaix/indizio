@@ -3,117 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caccia al Tesoro</title>
+    <title>Archivio Protetto</title>
     <style>
+        /* --- STILE NEUTRO INIZIALE (Bianco/Grigio) --- */
         body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #2e1a47; /* Viola scuro */
-            color: #f0c4f0; /* Rosa pallido */
+            font-family: Arial, sans-serif;
+            background-color: #ffffff; /* Sfondo bianco neutro */
+            color: #333333; /* Testo grigio scuro */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify_content: center;
-            height: 100vh;
+            justify-content: center;
+            min-height: 100vh;
             margin: 0;
             text-align: center;
+            transition: background-color 0.5s, color 0.5s; /* Transizione morbida */
+            overflow: hidden; /* Evita barre di scorrimento durante l'animazione */
         }
         .container {
-            background-color: #4b2c6e;
+            background-color: #f4f4f4; /* Contenitore grigio chiaro */
             padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 0 20px #000000;
-            border: 2px solid #f0c4f0;
+            border-radius: 8px;
+            border: 1px solid #cccccc; /* Bordo sottile grigio */
+            box-shadow: none;
             max-width: 90%;
             width: 350px;
+            transition: all 0.5s ease;
+            position: relative;
+            z-index: 10; /* Sta sopra gli elementi che cadono */
         }
-        h1 {
-            margin-bottom: 20px;
-        }
+        h1 { margin-bottom: 20px; }
         input {
             padding: 10px;
-            border-radius: 5px;
-            border: none;
+            border-radius: 4px;
+            border: 1px solid #ccc;
             width: 70%;
             margin-bottom: 15px;
             text-align: center;
             font-size: 16px;
+            background-color: #fff;
+            color: #333;
         }
         button {
             padding: 10px 20px;
-            border-radius: 5px;
-            border: none;
-            background-color: #f0c4f0;
-            color: #2e1a47;
+            border-radius: 4px;
+            border: 1px solid #999;
+            background-color: #e0e0e0; /* Bottone grigio neutro */
+            color: #333;
             font-weight: bold;
             cursor: pointer;
             font-size: 16px;
             transition: 0.3s;
         }
-        button:hover {
-            background-color: #ffffff;
-            transform: scale(1.05);
-        }
+        button:hover { background-color: #d0d0d0; }
         #error-msg {
-            color: #ff6b6b;
+            color: #d9534f; /* Rosso standard per errore */
             margin-top: 10px;
             display: none;
             font-weight: bold;
         }
-        .skull {
-            font-size: 40px;
-            margin-bottom: 10px;
+        /* Nascondiamo il teschio header all'inizio */
+        .skull-header { 
+            font-size: 40px; margin-bottom: 10px; display: none; 
+        }
+
+        /* --- TEMA KUROMI (Si attiva dopo la password) --- */
+        body.kuromi-theme {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #2e1a47 !important; /* Viola scuro */
+            color: #f0c4f0 !important; /* Rosa pallido */
+        }
+        body.kuromi-theme .container {
+            background-color: #4b2c6e;
+            border-radius: 20px;
+            box-shadow: 0 0 20px #000000;
+            border: 2px solid #f0c4f0;
+        }
+        body.kuromi-theme input {
+             background-color: #ffffff;
+             border: none;
+        }
+        body.kuromi-theme button {
+            background-color: #f0c4f0;
+            color: #2e1a47;
+            border: none;
+        }
+        body.kuromi-theme button:hover {
+            background-color: #ffffff;
+            transform: scale(1.05);
+        }
+        /* Mostra il teschio quando il tema è attivo */
+        body.kuromi-theme .skull-header { display: block; }
+
+        /* --- ANIMAZIONE PIOGGIA --- */
+        .falling-item {
+            position: fixed;
+            top: -50px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 1; /* Sta dietro il container */
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-fill-mode: forwards;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="skull">💀💜</div>
-        <h1>Parola d'ordine?</h1>
-        <p>Inserisci la password per ottenere l'indizio.</p>
+        <div class="skull-header">💀💜</div>
+        
+        <h1>Accesso Richiesto</h1>
+        <p>Inserisci la parola chiave per sbloccare il file.</p>
         
         <input type="password" id="passwordInput" placeholder="Password...">
         <br>
-        <button onclick="checkPassword()">Scarica Documento</button>
+        <button onclick="checkPassword()">Sblocca e Scarica</button>
         
-        <p id="error-msg">Password errata!</p>
+        <p id="error-msg">Accesso Negato!</p>
     </div>
 
     <script>
         function checkPassword() {
-            // QUI PUOI CAMBIARE LA PAROLA SEGRETA CHE SARA' NEL FILE SCARICATO
+            // --- MODIFICA QUI LA TUA PAROLA SEGRETA ---
             const parolaSegretaNelFile = "LA PAROLA E': MELA"; 
-            
-            // Prende il valore inserito
-            const input = document.getElementById("passwordInput").value;
-            const errorMsg = document.getElementById("error-msg");
+            // -------------------------------------------
 
-            // Controlla se la password è "kuromi" (ignora maiuscole/minuscole)
-            if (input.toLowerCase() === "kuromi") {
+            const input = document.getElementById("passwordInput");
+            const errorMsg = document.getElementById("error-msg");
+            const container = document.querySelector('.container');
+
+            if (input.value.toLowerCase() === "kuromi") {
+                // PASSWORD CORRETTA!
                 errorMsg.style.display = "none";
+                
+                // 1. Scarica il file
                 downloadFile(parolaSegretaNelFile);
+                
+                // 2. Attiva il tema Kuromi
+                document.body.classList.add('kuromi-theme');
+                // Cambia anche il titolo della pagina per effetto
+                document.title = "💀 Kuromi World 💜";
+                
+                // 3. Disabilita l'input e il bottone per evitare click multipli
+                input.disabled = true;
+                document.querySelector('button').disabled = true;
+                document.querySelector('button').innerText = "Sbloccato!";
+
+                // 4. Avvia la pioggia di elementi
+                startFallingAnimation();
+
             } else {
+                // PASSWORD ERRATA
                 errorMsg.style.display = "block";
-                // Piccola animazione di errore (scuote la casella)
-                const container = document.querySelector('.container');
+                // Animazione di errore (scuote la casella)
                 container.style.transform = "translateX(10px)";
                 setTimeout(() => { container.style.transform = "translateX(-10px)"; }, 100);
                 setTimeout(() => { container.style.transform = "translateX(0)"; }, 200);
             }
         }
 
+        // Funzione per far piovere cuori e teschi
+        function startFallingAnimation() {
+            const emojis = ['💜', '💀', '🖤', '👿', '🦴'];
+            const numberOfItems = 60; // Quanti elementi far cadere
+
+            for (let i = 0; i < numberOfItems; i++) {
+                // Crea un ritardo a cascata per non farli partire tutti insieme
+                setTimeout(() => {
+                    const item = document.createElement('div');
+                    item.classList.add('falling-item');
+                    // Scegli un emoji a caso
+                    item.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                    
+                    // Posizione orizzontale casuale
+                    item.style.left = Math.random() * 95 + 'vw';
+                    // Grandezza casuale
+                    const size = Math.random() * 30 + 15; // tra 15px e 45px
+                    item.style.fontSize = size + 'px';
+                    // Velocità di caduta casuale
+                    const duration = Math.random() * 3 + 2; // tra 2s e 5s
+                    item.style.animationDuration = duration + 's';
+
+                    document.body.appendChild(item);
+
+                    // Rimuovi l'elemento dopo che è caduto per non intasare la memoria
+                    setTimeout(() => {
+                        item.remove();
+                    }, duration * 1000 + 100);
+
+                }, i * 150); // Ogni elemento parte 150ms dopo il precedente
+            }
+        }
+
         function downloadFile(content) {
-            // Crea un elemento invisibile per il download
             const element = document.createElement('a');
             const file = new Blob([content], {type: 'text/plain'});
-            
             element.href = URL.createObjectURL(file);
-            element.download = "indizio_caccia_al_tesoro.txt"; // Nome del file scaricato
-            document.body.appendChild(element); // Richiesto per Firefox
+            element.download = "indizio_segreto.txt";
+            document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
-            
-            alert("Password corretta! Il file è stato scaricato.");
         }
     </script>
 </body>
