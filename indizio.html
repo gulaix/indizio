@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caccia al Tesoro</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #2e1a47; /* Viola scuro */
+            color: #f0c4f0; /* Rosa pallido */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify_content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: #4b2c6e;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px #000000;
+            border: 2px solid #f0c4f0;
+            max-width: 90%;
+            width: 350px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            width: 70%;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #f0c4f0;
+            color: #2e1a47;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #ffffff;
+            transform: scale(1.05);
+        }
+        #error-msg {
+            color: #ff6b6b;
+            margin-top: 10px;
+            display: none;
+            font-weight: bold;
+        }
+        .skull {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="skull">💀💜</div>
+        <h1>Parola d'ordine?</h1>
+        <p>Inserisci la password per ottenere l'indizio.</p>
+        
+        <input type="password" id="passwordInput" placeholder="Password...">
+        <br>
+        <button onclick="checkPassword()">Scarica Documento</button>
+        
+        <p id="error-msg">Password errata!</p>
+    </div>
+
+    <script>
+        function checkPassword() {
+            // QUI PUOI CAMBIARE LA PAROLA SEGRETA CHE SARA' NEL FILE SCARICATO
+            const parolaSegretaNelFile = "LA PAROLA E': MELA"; 
+            
+            // Prende il valore inserito
+            const input = document.getElementById("passwordInput").value;
+            const errorMsg = document.getElementById("error-msg");
+
+            // Controlla se la password è "kuromi" (ignora maiuscole/minuscole)
+            if (input.toLowerCase() === "kuromi") {
+                errorMsg.style.display = "none";
+                downloadFile(parolaSegretaNelFile);
+            } else {
+                errorMsg.style.display = "block";
+                // Piccola animazione di errore (scuote la casella)
+                const container = document.querySelector('.container');
+                container.style.transform = "translateX(10px)";
+                setTimeout(() => { container.style.transform = "translateX(-10px)"; }, 100);
+                setTimeout(() => { container.style.transform = "translateX(0)"; }, 200);
+            }
+        }
+
+        function downloadFile(content) {
+            // Crea un elemento invisibile per il download
+            const element = document.createElement('a');
+            const file = new Blob([content], {type: 'text/plain'});
+            
+            element.href = URL.createObjectURL(file);
+            element.download = "indizio_caccia_al_tesoro.txt"; // Nome del file scaricato
+            document.body.appendChild(element); // Richiesto per Firefox
+            element.click();
+            document.body.removeChild(element);
+            
+            alert("Password corretta! Il file è stato scaricato.");
+        }
+    </script>
+</body>
+</html>
